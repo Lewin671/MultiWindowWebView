@@ -7,25 +7,13 @@ import android.webkit.WebView
 import android.webkit.WebView.WebViewTransport
 
 abstract class BaseWebChromeClient : WebChromeClient() {
-    private var tempWebView: WebView? = null
 
     override fun onCreateWindow(
         view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?
     ): Boolean {
-        cleanupTempWebView()
-        createAndSetupTempWebView(view?.context, resultMsg)
-        return true
-    }
+        val context = view?.context ?: return false
 
-    private fun cleanupTempWebView() {
-        tempWebView?.destroy()
-        tempWebView = null
-    }
-
-    private fun createAndSetupTempWebView(context: Context?, resultMsg: Message?) {
-        if (context == null) return
-
-        tempWebView = WebView(context).apply {
+        val tempWebView = WebView(context).apply {
             settings.apply {
                 javaScriptEnabled = true
                 domStorageEnabled = true
@@ -33,8 +21,9 @@ abstract class BaseWebChromeClient : WebChromeClient() {
                 setSupportMultipleWindows(true)
                 javaScriptCanOpenWindowsAutomatically = true
             }
-            webViewClient = createTempWebViewClient(context)
         }
+        tempWebView.webViewClient = createTempWebViewClient(tempWebView, context)
+
 
         resultMsg?.obj?.let { obj ->
             if (obj is WebViewTransport) {
@@ -42,11 +31,12 @@ abstract class BaseWebChromeClient : WebChromeClient() {
                 resultMsg.sendToTarget()
             }
         }
+        return true
     }
 
-    protected abstract fun createTempWebViewClient(context: Context): BaseWebViewClient
 
-    fun destroy() {
-        cleanupTempWebView()
-    }
+    protected abstract fun createTempWebViewClient(
+        tempWebView: WebView,
+        context: Context
+    ): BaseWebViewClient
 }
