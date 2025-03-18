@@ -1,26 +1,21 @@
 package com.example.webviewopenwindowtest
 
-import android.content.Context
-import android.content.Intent
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
-open class BaseWebViewClient(private val context: Context) : WebViewClient() {
+abstract class BaseWebViewClient(private val forOpenNewWindow: Boolean = false) : WebViewClient() {
     override fun shouldOverrideUrlLoading(
         view: WebView?,
         request: WebResourceRequest?
     ): Boolean {
-        request?.url?.toString()?.let { url ->
-            openInNewActivity(url)
+        if (forOpenNewWindow) {
+            request?.url?.toString()?.also {
+                openInNewActivity(it)
+            }
         }
-        return true
+        return false
     }
 
-    protected open fun openInNewActivity(url: String) {
-        val intent = Intent(context, MainActivity::class.java).apply {
-            putExtra("url", url)
-        }
-        context.startActivity(intent)
-    }
+    protected abstract fun openInNewActivity(url: String)
 }

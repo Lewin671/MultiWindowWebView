@@ -15,6 +15,8 @@ class MainActivity : AppCompatActivity() {
         // Load URL from intent or default test HTML file
         val url = intent.getStringExtra("url") ?: "file:///android_asset/test.html"
         webView.loadUrl(url)
+        webView.webViewClient = DemoWebViewClient(this, false)
+        webView.webChromeClient = DemoWebChromeClient()
     }
 
     override fun onDestroy() {

@@ -6,7 +6,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebView.WebViewTransport
 
-open class BaseWebChromeClient : WebChromeClient() {
+abstract class BaseWebChromeClient : WebChromeClient() {
     private var tempWebView: WebView? = null
 
     override fun onCreateWindow(
@@ -44,9 +44,7 @@ open class BaseWebChromeClient : WebChromeClient() {
         }
     }
 
-    protected open fun createTempWebViewClient(context: Context): BaseWebViewClient {
-        return BaseWebViewClient(context)
-    }
+    protected abstract fun createTempWebViewClient(context: Context): BaseWebViewClient
 
     fun destroy() {
         cleanupTempWebView()
